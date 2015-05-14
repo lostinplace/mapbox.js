@@ -17,7 +17,9 @@ module.exports = function(url, options) {
         url = urlhelper('/geocode/' + url + '/{query}.json?proximity={proximity}', options && options.accessToken);
     }
 
-    geocoder.getURL = function() {
+    geocoder.getURL = function(reverse) {
+        if (reverse) url = url.split('proximity={proximity}&').join('');
+        console.log(url);
         return url;
     };
 
@@ -35,7 +37,7 @@ module.exports = function(url, options) {
         }
 
         feedback.record({geocoding: query});
-        return L.Util.template(geocoder.getURL(), {query: query, proximity: proximity});
+        return L.Util.template(geocoder.getURL(!proximity), {query: query, proximity: proximity});
     };
 
     geocoder.query = function(_, proximity, callback) {

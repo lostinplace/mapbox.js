@@ -173,7 +173,9 @@ var GeocoderControl = L.Control.extend({
         L.DomEvent.preventDefault(e);
         if (this._input.value === '') return this._updateSubmit();
         L.DomUtil.addClass(this._container, 'searching');
-        this.geocoder.query(this._input.value, this._updateSubmit);
+        var proximity = this._map.getCenter();
+        proximity = [proximity.lng, proximity.lat].join(',');
+        this.geocoder.query(this._input.value, proximity, this._updateSubmit);
     },
 
     _autocomplete: function(e) {

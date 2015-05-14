@@ -14,14 +14,14 @@ module.exports = function(url, options) {
     util.strict(url, 'string');
 
     if (url.indexOf('/') === -1) {
-        url = urlhelper('/geocode/' + url + '/{query}.json', options && options.accessToken);
+        url = urlhelper('/geocode/' + url + '/{query}.json?proximity={proximity}', options && options.accessToken);
     }
 
     geocoder.getURL = function() {
         return url;
     };
 
-    geocoder.queryURL = function(_) {
+    geocoder.queryURL = function(_, proximity) {
         var query;
 
         if (typeof _ !== 'string') {
@@ -35,12 +35,12 @@ module.exports = function(url, options) {
         }
 
         feedback.record({geocoding: query});
-        return L.Util.template(geocoder.getURL(), {query: query});
+        return L.Util.template(geocoder.getURL(), {query: query, proximity: proximity});
     };
 
-    geocoder.query = function(_, callback) {
+    geocoder.query = function(_, proximity, callback) {
         util.strict(callback, 'function');
-        request(geocoder.queryURL(_), function(err, json) {
+        request(geocoder.queryURL(_, proximity), function(err, json) {
             if (json && (json.length || json.features)) {
                 var res = {
                     results: json

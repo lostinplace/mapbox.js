@@ -12,8 +12,8 @@ describe('L.mapbox.geocoder', function() {
     describe('#queryURL', function() {
         it('supports multiple arguments', function() {
             var g = L.mapbox.geocoder('mapbox.places');
-            expect(g.queryURL(['austin', 'houston']))
-                .to.eql('http://a.tiles.mapbox.com/v4/geocode/mapbox.places/austin;houston.json?access_token=key');
+            expect(g.queryURL(['austin', 'houston'], '-95,29'))
+                .to.eql('http://a.tiles.mapbox.com/v4/geocode/mapbox.places/austin;houston.json?proximity=-95,29&access_token=key');
         });
     });
 
@@ -22,10 +22,10 @@ describe('L.mapbox.geocoder', function() {
             var g = L.mapbox.geocoder('mapbox.places');
 
             server.respondWith('GET',
-                'http://a.tiles.mapbox.com/v4/geocode/mapbox.places/austin;houston.json?access_token=key',
+                'http://a.tiles.mapbox.com/v4/geocode/mapbox.places/austin;houston.json?proximity=-95,29&access_token=key',
                 [200, { 'Content-Type': 'application/json' }, JSON.stringify(helpers.geocoderBulk)]);
 
-            g.query(['austin', 'houston'], function(err, res) {
+            g.query(['austin', 'houston'], '-95,29', function(err, res) {
                 expect(err).to.eql(null);
                 done();
             });
@@ -37,10 +37,10 @@ describe('L.mapbox.geocoder', function() {
             var g = L.mapbox.geocoder('mapbox.places');
 
             server.respondWith('GET',
-                'http://a.tiles.mapbox.com/v4/geocode/mapbox.places/austin.json?access_token=key',
+                'http://a.tiles.mapbox.com/v4/geocode/mapbox.places/austin.json?proximity=-95,29&access_token=key',
                 [200, { "Content-Type": "application/json" }, JSON.stringify(helpers.geocoderAustin)]);
 
-            g.query('austin', function(err, res) {
+            g.query('austin', '-95,29', function(err, res) {
                 expect(res.latlng).to.be.near({ lat: 30.2, lng: -97.8 }, 1e-1);
                 expect(res.results).to.eql(helpers.geocoderAustin);
                 done();
@@ -53,10 +53,10 @@ describe('L.mapbox.geocoder', function() {
             var g = L.mapbox.geocoder('mapbox.places');
 
             server.respondWith('GET',
-                'http://a.tiles.mapbox.com/v4/geocode/mapbox.places/nonesuch.json?access_token=key',
+                'http://a.tiles.mapbox.com/v4/geocode/mapbox.places/nonesuch.json?proximity=0,0&access_token=key',
                 [200, { 'Content-Type': 'application/json' }, JSON.stringify({"type":"FeatureCollection","query":["nonesuch"],"features":[]})]);
 
-            g.query('nonesuch', function(err, res) {
+            g.query('nonesuch', '0,0', function(err, res) {
                 expect(err).to.eql(null);
                 done();
             });
